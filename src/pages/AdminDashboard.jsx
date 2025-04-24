@@ -26,7 +26,7 @@ export default function AdminDashboard() {
     }
 
     axios
-      .get('http://localhost:5000/api/booking', {
+      .get('${API_BASE_URL}/api/booking', {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
     const id = bookings[index].id;
     if (!confirm('Yakin ingin menghapus booking ini?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/booking/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/booking/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success('Booking berhasil dihapus');
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
     const id = bookings[index].id;
     try {
       await axios.patch(
-        `http://localhost:5000/api/booking/${id}`,
+        `${API_BASE_URL}/api/booking/${id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -90,13 +90,13 @@ export default function AdminDashboard() {
   const totalUnverified = totalBooking - totalVerified;
 
   const handleExport = () => {
-    window.open('http://localhost:5000/api/booking/export', '_blank');
+    window.open('${API_BASE_URL}/api/booking/export', '_blank');
   };
 
   const handleDownloadStruk = async (id) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/booking/receipt/${id}`,
+        `${API_BASE_URL}/api/booking/receipt/${id}`,
         {
           responseType: 'blob',
           headers: { Authorization: `Bearer ${token}` },
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                     )}
                     <div className="mt-3 space-x-4">
                       <a
-                        href={`http://localhost:5000/uploads/${b.ktp}`}
+                        href={`${API_BASE_URL}/uploads/${b.ktp}`}
                         target="_blank"
                         rel="noreferrer"
                         className="text-sm underline"
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
                         📄 KTP
                       </a>
                       <a
-                        href={`http://localhost:5000/uploads/${b.kk}`}
+                        href={`${API_BASE_URL}/uploads/${b.kk}`}
                         target="_blank"
                         rel="noreferrer"
                         className="text-sm underline"

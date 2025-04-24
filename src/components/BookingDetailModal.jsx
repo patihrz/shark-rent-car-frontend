@@ -23,7 +23,7 @@ export default function BookingDetailModal({ data, onClose }) {
 
         <div className="mt-4 flex justify-end gap-3">
           <a
-            href={`http://localhost:5000/uploads/${data.ktp}`}
+            href={`${API_BASE_URL}/uploads/${data.ktp}`}
             target="_blank"
             rel="noreferrer"
             className="text-sm text-blue-600 dark:text-blue-400 underline"
@@ -31,7 +31,7 @@ export default function BookingDetailModal({ data, onClose }) {
             Lihat KTP
           </a>
           <a
-            href={`http://localhost:5000/uploads/${data.kk}`}
+            href={`${API_BASE_URL}/uploads/${data.kk}`}
             target="_blank"
             rel="noreferrer"
             className="text-sm text-blue-600 dark:text-blue-400 underline"

@@ -94,7 +94,7 @@ export default function BookingForm() {
       sessionStorage.getItem('userToken');
 
     try {
-      await axios.post('http://localhost:5000/api/booking', data, {
+      await axios.post('${API_BASE_URL}/api/booking', data, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

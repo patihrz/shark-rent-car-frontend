@@ -28,7 +28,7 @@ export default function BookingHistory() {
     setUser(parsedUser);
 
     axios
-      .get(`http://localhost:5000/api/booking/user/${parsedUser.email}`, {
+      .get(`${API_BASE_URL}/api/booking/user/${parsedUser.email}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setBookings(res.data))
@@ -46,7 +46,7 @@ export default function BookingHistory() {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/booking/receipt/${id}`,
+        `${API_BASE_URL}/api/booking/receipt/${id}`,
         {
           responseType: 'blob',
           headers: { Authorization: `Bearer ${token}` },
@@ -117,7 +117,7 @@ export default function BookingHistory() {
 
                 <div className="flex flex-wrap gap-4 mt-4 text-sm font-medium">
                   <a
-                    href={`http://localhost:5000/uploads/${b.ktp}`}
+                    href={`${API_BASE_URL}/uploads/${b.ktp}`}
                     target="_blank"
                     rel="noreferrer"
                     className="text-blue-600 dark:text-blue-400 hover:underline"
@@ -125,7 +125,7 @@ export default function BookingHistory() {
                     🪪 Lihat KTP
                   </a>
                   <a
-                    href={`http://localhost:5000/uploads/${b.kk}`}
+                    href={`${API_BASE_URL}/uploads/${b.kk}`}
                     target="_blank"
                     rel="noreferrer"
                     className="text-blue-600 dark:text-blue-400 hover:underline"
