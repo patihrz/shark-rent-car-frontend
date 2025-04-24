@@ -4,6 +4,9 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
+// Definisikan API_BASE_URL di sini.  Sesuaikan dengan konfigurasi proyek Anda.
+const API_BASE_URL = 'https://shark-rent-car-backend-production.up.railway.app/'; // Ganti dengan URL backend Anda
+
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +15,7 @@ export default function AdminLogin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('${API_BASE_URL}/api/auth/login', {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         email,
         password,
       });
@@ -78,3 +81,4 @@ export default function AdminLogin() {
     </div>
   );
 }
+
