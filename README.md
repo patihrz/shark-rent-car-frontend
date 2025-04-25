@@ -2,8 +2,8 @@
 
 **Shark Rent Car** adalah platform penyewaan mobil modern yang dirancang untuk memudahkan pengguna dalam melakukan reservasi kendaraan secara online. Dibangun dengan teknologi terbaru, platform ini menawarkan antarmuka yang elegan, cepat, dan responsif, dengan backend yang stabil dan aman.
 
-🔗 **Live Website:** [https://shark-rent-car.netlify.app](https://shark-rent-car.netlify.app)  
-🔗 **Backend API:** [https://shark-rent-car-backend-production.up.railway.app](https://shark-rent-car-backend-production.up.railway.app)
+🔗 **Live Website:** [DEMO](https://shark-rent-car.netlify.app)  
+🔗 **Backend API:** [BACKEND](https://shark-rent-car-backend-production.up.railway.app)
 
 ---
 
@@ -89,9 +89,9 @@ JWT_SECRET=your_jwt_secret
 👨‍💻 Patih Ramadika
 Fullstack Developer & IT Support
 
-🌐 LinkedIn [https://shark-rent-car-backend-production.up.railway.app](https://shark-rent-car-backend-production.up.railway.app)
+🌐 LinkedIn (https://www.linkedin.com/in/patih-ramadika-19b763217/?originalSubdomain=id)
 
-🐙 GitHub [Github](https://github.com/patihrz/)
+🐙 GitHub (https://github.com/patihrz/)
 
 📜 Lisensi
 Proyek ini dirilis di bawah lisensi MIT License
