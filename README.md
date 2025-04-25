@@ -1,4 +1,4 @@
-# 🦈 Shark Rent Car
+# 🦈 Shark Rent Car - Fullstack Car App Berbasis Web
 
 **Shark Rent Car** adalah platform penyewaan mobil modern yang dirancang untuk memudahkan pengguna dalam melakukan reservasi kendaraan secara online. Dibangun dengan teknologi terbaru, platform ini menawarkan antarmuka yang elegan, cepat, dan responsif, dengan backend yang stabil dan aman.
 
@@ -26,26 +26,26 @@
 
 ---
 
-## 🧠 Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-- React.js
-- Tailwind CSS
-- Framer Motion
-- Axios
-- React Router DOM
+- **React.js** - Library UI utama
+- **Tailwind CSS** - Utility-first CSS untuk desain cepat & responsif
+- **Framer Motion** - Animasi smooth dan modern
+- **Axios** - HTTP client untuk komunikasi dengan backend
+- **Google reCAPTCHA v2** - Validasi keamanan saat login
 
 ### Backend
-- Node.js
-- Express.js
-- MongoDB (Atlas)
-- Mongoose
-- dotenv, bcryptjs, jsonwebtoken
+- **Node.js** - Runtime JavaScript di server
+- **Express.js** - Framework server-side routing
+- **JWT (jsonwebtoken)** - Autentikasi dan otorisasi
+- **bcrypt.js** - Enkripsi password
+- **CORS Middleware** - Keamanan cross-origin
+- **File System (fs)** - Simpan data user dalam `users.json`
 
-### Deployment
-- Frontend: [Netlify](https://www.netlify.com/)
-- Backend: [Railway](https://railway.app/)
-- Database: [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+### Hosting
+- **Frontend:** Netlify  
+- **Backend:** Railway
 
 ---
 
