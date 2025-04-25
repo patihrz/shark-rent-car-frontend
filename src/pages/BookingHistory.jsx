@@ -4,42 +4,54 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
+// Definisikan API_BASE_URL di sini, pastikan sesuai dengan backend Anda
+const API_BASE_URL = 'https://shark-rent-car-backend-production.up.railway.app'; // Ganti dengan URL backend Anda
+
 export default function BookingHistory() {
   const [bookings, setBookings] = useState([]);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true); // Tambahkan state untuk loading
 
   useEffect(() => {
-    // Cek token dan data user di localStorage atau sessionStorage
-    const token =
-      localStorage.getItem('userToken') ||
-      sessionStorage.getItem('userToken');
-    const userData =
-      localStorage.getItem('userData') ||
-      sessionStorage.getItem('userData');
+    const fetchData = async () => { // Refactor useEffect ke async function
+      setLoading(true); // Set loading ke true sebelum fetch
+      try {
+        // Cek token dan data user di localStorage atau sessionStorage
+        const token =
+          localStorage.getItem('userToken') ||
+          sessionStorage.getItem('userToken');
+        const userData =
+          localStorage.getItem('userData') ||
+          sessionStorage.getItem('userData');
 
-    if (!token || !userData) {
-      toast.error('⚠️ Kamu belum login!');
-      navigate('/login');
-      return;
-    }
+        if (!token || !userData) {
+          toast.error('⚠️ Kamu belum login!');
+          navigate('/login');
+          return;
+        }
 
-    const parsedUser = JSON.parse(userData);
-    setUser(parsedUser);
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
 
-    axios
-      .get(`${API_BASE_URL}/api/booking/user/${parsedUser.email}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setBookings(res.data))
-      .catch((err) => {
+        const res = await axios.get(`${API_BASE_URL}/api/booking/user/${parsedUser.email}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setBookings(res.data);
+      } catch (err) {
         toast.error('❌ Gagal mengambil data booking');
         console.error(err);
-      });
+      } finally {
+        setLoading(false); // Set loading ke false setelah fetch selesai/error
+      }
+    };
+
+    fetchData();
   }, [navigate]);
 
   const handleDownloadStruk = async (id) => {
-    // Ambil token dari localStorage atau sessionStorage
     const token =
       localStorage.getItem('userToken') ||
       sessionStorage.getItem('userToken');
@@ -49,11 +61,12 @@ export default function BookingHistory() {
         `${API_BASE_URL}/api/booking/receipt/${id}`,
         {
           responseType: 'blob',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
-      // Buat URL untuk blob dan trigger download
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -61,11 +74,20 @@ export default function BookingHistory() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url); // Clean up the URL object
     } catch (err) {
       console.error(err);
       toast.error('❌ Gagal mengunduh struk');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p> {/* Bisa diganti dengan animasi loading yang lebih baik */}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen px-6 pt-24 pb-16 transition-colors bg-white text-gray-900 dark:bg-[#0b0e1c] dark:text-white">
@@ -99,14 +121,14 @@ export default function BookingHistory() {
                 className="p-6 rounded-xl border shadow-md hover:shadow-lg transition-all duration-300 bg-gray-100 border-gray-300 text-gray-900 dark:bg-[#101524] dark:border-slate-700 dark:text-white"
               >
                 <div className="mb-4 space-y-1">
-                  <h2 className="text-xl font-semibold text-cyan-600 dark:text-cyan-400">{b.mobil}</h2>
-                  <p><span className="font-semibold">📅 Tanggal:</span> {b.tanggal}</p>
-                  <p><span className="font-semibold">⏱ Durasi:</span> {b.durasi} hari</p>
-                  {b.catatan && (
-                    <p className="italic text-sm text-gray-500 dark:text-slate-400">“{b.catatan}”</p>
+                  <h2 className="text-xl font-semibold text-cyan-600 dark:text-cyan-400">{b.car?.name || 'Nama Mobil Tidak Tersedia'}</h2> {/* Penanganan jika b.mobil tidak ada */}
+                  <p><span className="font-semibold">📅 Tanggal:</span> {b.date}</p> {/* Sesuaikan dengan nama properti yang benar */}
+                  <p><span className="font-semibold">⏱ Durasi:</span> {b.duration} hari</p>  {/* Sesuaikan */}
+                  {b.notes && (
+                    <p className="italic text-sm text-gray-500 dark:text-slate-400">“{b.notes}”</p>
                   )}
                   <p className="mt-2">
-                    <span className="font-semibold">🔐 Status:</span>{' '}
+                    <span className="font-semibold">🔐 Status:</span>
                     {b.verified ? (
                       <span className="text-green-600 dark:text-green-400 font-bold">✅ Terverifikasi</span>
                     ) : (
@@ -117,7 +139,7 @@ export default function BookingHistory() {
 
                 <div className="flex flex-wrap gap-4 mt-4 text-sm font-medium">
                   <a
-                    href={`${API_BASE_URL}/uploads/${b.ktp}`}
+                    href={`${API_BASE_URL}/uploads/${b.identity_card}`}  // Sesuaikan nama properti
                     target="_blank"
                     rel="noreferrer"
                     className="text-blue-600 dark:text-blue-400 hover:underline"
@@ -125,7 +147,7 @@ export default function BookingHistory() {
                     🪪 Lihat KTP
                   </a>
                   <a
-                    href={`${API_BASE_URL}/uploads/${b.kk}`}
+                    href={`${API_BASE_URL}/uploads/${b.family_card}`} // Sesuaikan nama properti
                     target="_blank"
                     rel="noreferrer"
                     className="text-blue-600 dark:text-blue-400 hover:underline"
