@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 // Definisikan API_BASE_URL di sini, pastikan sudah sesuai dengan konfigurasi proyek Anda.
-const API_BASE_URL = 'https://shark-rent-car-backend-production.up.railway.app/'; // Ganti dengan URL backend Anda
+const API_BASE_URL = 'https://shark-rent-car-backend-production.up.railway.app'; // Ganti dengan URL backend Anda
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
