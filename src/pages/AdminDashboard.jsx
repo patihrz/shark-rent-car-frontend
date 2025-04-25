@@ -1,107 +1,70 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
-import StatCard from '../components/StatCard';
-import SearchBar from '../components/SearchBar';
-import BookingDetailModal from '../components/BookingDetailModal';
+const API_BASE_URL = 'https://shark-rent-car-backend-production.up.railway.app';
 
-export default function AdminDashboard() {
+export default function BookingHistory() {
   const [bookings, setBookings] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
-
-  // Ambil JWT admin
-  const token =
-    localStorage.getItem('adminToken') ||
-    sessionStorage.getItem('adminToken');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!token) {
-      navigate('/admin/login');
-      return;
-    }
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const token =
+          localStorage.getItem('userToken') ||
+          sessionStorage.getItem('userToken');
+        const userData =
+          localStorage.getItem('userData') ||
+          sessionStorage.getItem('userData');
 
-    axios
-      .get('${API_BASE_URL}/api/booking', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
+        if (!token || !userData) {
+          toast.error('⚠️ Kamu belum login!');
+          navigate('/login');
+          return;
+        }
+
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+
+        const res = await axios.get(`${API_BASE_URL}/api/booking/user/${parsedUser.email}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setBookings(res.data);
-        setFiltered(res.data);
-      })
-      .catch((err) => {
-        console.error('❌ Gagal fetch data booking:', err);
-        toast.error('❌ Gagal memuat data booking');
-      });
-  }, [navigate, token]);
+      } catch (err) {
+        toast.error('❌ Gagal mengambil data booking');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleDelete = async (index) => {
-    const id = bookings[index].id;
-    if (!confirm('Yakin ingin menghapus booking ini?')) return;
-    try {
-      await axios.delete(`${API_BASE_URL}/api/booking/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success('Booking berhasil dihapus');
-      const newList = bookings.filter((b) => b.id !== id);
-      setBookings(newList);
-      setFiltered(newList);
-    } catch (err) {
-      console.error(err);
-      toast.error('Gagal menghapus booking');
-    }
-  };
-
-  const toggleVerifikasi = async (index) => {
-    const id = bookings[index].id;
-    try {
-      await axios.patch(
-        `${API_BASE_URL}/api/booking/${id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const updated = bookings.map((b) =>
-        b.id === id ? { ...b, verified: !b.verified } : b
-      );
-      setBookings(updated);
-      setFiltered(updated);
-      toast.success('Status verifikasi diperbarui');
-    } catch (err) {
-      console.error(err);
-      toast.error('Gagal memperbarui verifikasi');
-    }
-  };
-
-  const handleSearch = (term) => {
-    if (!term) return setFiltered(bookings);
-    setFiltered(
-      bookings.filter((b) =>
-        b.name.toLowerCase().includes(term.toLowerCase())
-      )
-    );
-  };
-
-  const totalBooking = bookings.length;
-  const totalVerified = bookings.filter((b) => b.verified).length;
-  const totalUnverified = totalBooking - totalVerified;
-
-  const handleExport = () => {
-    window.open('${API_BASE_URL}/api/booking/export', '_blank');
-  };
+    fetchData();
+  }, [navigate]);
 
   const handleDownloadStruk = async (id) => {
+    const token =
+      localStorage.getItem('userToken') ||
+      sessionStorage.getItem('userToken');
+
     try {
       const res = await axios.get(
         `${API_BASE_URL}/api/booking/receipt/${id}`,
         {
           responseType: 'blob',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
+
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -109,118 +72,103 @@ export default function AdminDashboard() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
       toast.error('❌ Gagal mengunduh struk');
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen pt-24 pb-12 px-4 bg-white dark:bg-[#0b0e1c] text-gray-900 dark:text-white">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen px-6 pt-24 pb-16 transition-colors bg-white text-gray-900 dark:bg-[#0b0e1c] dark:text-white">
+      <div className="max-w-5xl mx-auto space-y-10">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-6"
+          className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"
         >
-          📋 Daftar Booking Masuk
+          📝 Riwayat Booking Anda
         </motion.h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <StatCard title="Total Booking" value={totalBooking} icon="📦" color="bg-cyan-500" />
-          <StatCard title="Terverifikasi" value={totalVerified} icon="✅" color="bg-green-500" />
-          <StatCard title="Belum Verifikasi" value={totalUnverified} icon="⏳" color="bg-yellow-500" />
-        </div>
-
-        <SearchBar onSearch={handleSearch} />
-
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleExport}
-          className="mb-6 px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold rounded-xl"
-        >
-          📤 Export ke Excel
-        </motion.button>
-
-        {filtered.length === 0 ? (
-          <p className="text-gray-500 dark:text-slate-400">Belum ada booking.</p>
+        {bookings.length === 0 ? (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-gray-500 dark:text-slate-400 text-lg"
+          >
+            Belum ada booking yang dilakukan.
+          </motion.p>
         ) : (
           <div className="grid gap-6">
-            {filtered.map((b, i) => (
-              <motion.div
-                key={b.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="bg-gray-100 dark:bg-[#111827] border rounded-xl p-5 shadow-sm"
-              >
-                <div className="flex justify-between">
-                  <div>
-                    <h2
-                      className="text-xl font-semibold text-cyan-600 dark:text-cyan-400 cursor-pointer"
-                      onClick={() => setSelectedBooking(b)}
-                    >
-                      {b.name}
+            {bookings.map((b, i) => {
+              // Log data per booking untuk memeriksa struktur respons
+              console.log('Data Booking:', b);
+
+              return (
+                <motion.div
+                  key={b.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07 }}
+                  className="p-6 rounded-xl border shadow-md hover:shadow-lg transition-all duration-300 bg-gray-100 border-gray-300 text-gray-900 dark:bg-[#101524] dark:border-slate-700 dark:text-white"
+                >
+                  <div className="mb-4 space-y-1">
+                    <h2 className="text-xl font-semibold text-cyan-600 dark:text-cyan-400">
+                      {b.car?.name || b.car_name || 'Nama Mobil Tidak Tersedia'}
                     </h2>
-                    <p className="text-sm mt-1">
-                      Tanggal: {b.tanggal} | Durasi: {b.durasi} hari
-                    </p>
-                    {b.catatan && (
-                      <p className="text-sm italic mt-2">“{b.catatan}”</p>
+                    <p><span className="font-semibold">📅 Tanggal:</span> {b.date || b.booking_date || 'Tanggal Tidak Tersedia'}</p>
+                    <p><span className="font-semibold">⏱ Durasi:</span> {b.duration || b.rental_duration || 'Durasi Tidak Tersedia'} hari</p>
+                    {b.notes && (
+                      <p className="italic text-sm text-gray-500 dark:text-slate-400">“{b.notes}”</p>
                     )}
-                    <div className="mt-3 space-x-4">
-                      <a
-                        href={`${API_BASE_URL}/uploads/${b.ktp}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm underline"
-                      >
-                        📄 KTP
-                      </a>
-                      <a
-                        href={`${API_BASE_URL}/uploads/${b.kk}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm underline"
-                      >
-                        📄 KK
-                      </a>
-                      <button
-                        onClick={() => handleDownloadStruk(b.id)}
-                        className="text-sm text-green-600 hover:underline ml-2"
-                      >
-                        📄 Unduh Struk
-                      </button>
-                    </div>
-                    <label className="inline-flex items-center mt-3 gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={b.verified || false}
-                        onChange={() => toggleVerifikasi(i)}
-                        className="accent-cyan-500"
-                      />
-                      <span>Verifikasi ✔</span>
-                    </label>
-                    <button
-                      onClick={() => handleDelete(i)}
-                      className="text-red-600 mt-3 hover:underline text-sm"
+                    <p className="mt-2">
+                      <span className="font-semibold">🔐 Status:</span>
+                      {b.verified ? (
+                        <span className="text-green-600 dark:text-green-400 font-bold">✅ Terverifikasi</span>
+                      ) : (
+                        <span className="text-yellow-600 dark:text-yellow-400 font-bold">⏳ Menunggu Verifikasi</span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-4 mt-4 text-sm font-medium">
+                    <a
+                      href={`${API_BASE_URL}/uploads/${b.identity_card}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
                     >
-                      🗑 Hapus
+                      🪪 Lihat KTP
+                    </a>
+                    <a
+                      href={`${API_BASE_URL}/uploads/${b.family_card}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      🏠 Lihat KK
+                    </a>
+                    <button
+                      onClick={() => handleDownloadStruk(b.id)}
+                      className="cursor-pointer text-green-600 dark:text-green-400 hover:underline bg-none p-0"
+                    >
+                      📄 Unduh Struk
                     </button>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
-        )}
-
-        {selectedBooking && (
-          <BookingDetailModal
-            booking={selectedBooking}
-            onClose={() => setSelectedBooking(null)}
-          />
         )}
       </div>
     </div>
