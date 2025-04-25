@@ -30,7 +30,7 @@ export default function LoginPage() {
       return;
     }
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/user/login`, {
+      const res = await axios.post(`${API_BASE_URL}api/user/login`, {
         email,
         password,
         captcha: captchaValue,
